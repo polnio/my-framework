@@ -26,12 +26,27 @@ class Route {
   }
 
   static async run (method: string, url: string) {
-    const route = this.routes.find(r => r.method.toLowerCase() === method.toLowerCase() && r.url === url)
+    const trimmedUrl = '/' + url
+      .replace(/^(\/)*/, '')
+      .replace(/(\/)*$/, '')
+
+    const [route, args] = this.routes.reduce((acc, r) => {
+      const match = new RegExp('^' + r.url.replace(/{([\w]+)}/g, '([^/]+)') + '$').exec(trimmedUrl)
+      if (
+        r.method.toLowerCase() === method.toLowerCase()
+        && match !== null
+      ) {
+        return [r, match.slice(1)]
+      }
+      return acc
+    }, undefined as [Route, RegExpExecArray]) ?? [undefined, undefined]
+
+    console.log(args)
     if (route === undefined) return undefined
-    if (typeof route.action === 'function') return route.action()
+    if (typeof route.action === 'function') return route.action(...args)
     if (typeof route.action === 'string') {
       const [controller, func] = route.action.split('@')
-      return (new (await import(`@app/controllers/${controller}.ts`)).default)[func]()
+      return (new (await import(`@app/controllers/${controller}.ts`)).default)[func](...args)
     }
   }
 }
