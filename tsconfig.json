@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "build",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "target": "esnext",
+    "module": "Node16",
+    "removeComments": true,
+    "paths": {
+      "@core/*": ["./core/*"],
+      "@app/*": ["./app/*"]
+    }
+  }
+}
